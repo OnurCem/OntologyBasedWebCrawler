@@ -1,4 +1,4 @@
-This is your new Play application
+Ontology Based Web Crawler
 =================================
 
-This file will be packaged with your application, when using `activator dist`.
+It allows to develop ontology with simple interface. Crawls e-commerce websites for product comments and stores crawled data in graph database.

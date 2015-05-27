@@ -1,0 +1,46 @@
+.header {
+    font-size: 18px;
+    font-weight: bold;
+    color: #337ab7;
+}
+
+.search-result-row {
+    cursor: pointer;
+    cursor: hand;
+    border-radius: 4px;
+    padding: 10px;
+}
+
+.search-result-row:hover {
+    background-color: #e6e6e6;
+}
+
+.search-result-header {
+    font-size: 16px;
+    color: #337ab7;
+}
+
+.search-result-details {
+    margin-left: 10px;
+    font-size: 14px;
+    color: #000000;
+}
+
+.search-result-details b {
+    color: #d9534f;
+}
+
+.comment-row {
+    padding: 10px;
+}
+
+.comment-header {
+    font-size: 16px;
+    color: #337ab7;
+}
+
+.comment-content {
+    margin-left: 10px;
+    font-size: 14px;
+    color: #000000;
+}

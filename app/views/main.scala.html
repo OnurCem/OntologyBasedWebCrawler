@@ -1,0 +1,228 @@
+<!doctype html>
+<html ng-app="OntMngApp">
+    <head>
+        <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
+        <script src='@routes.Assets.at("controllers.js")' type="text/javascript"></script>
+        <script src='@routes.Assets.at("xeditable.js")'></script>
+        <link rel="stylesheet" href='@routes.Assets.at("main.css")'>
+        <link rel="stylesheet" href='@routes.Assets.at("xeditable.css")'>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+    </head>
+    <body>
+        <div ng-controller="EditableRowCtrl" class="container" style="width: 600px">
+            <div class="tabbable tabs-below">
+                <ul class="nav nav-pills">
+                    <li ng-class="{active: selectedTab == 1}">
+                        <a href="#" ng-click="selectedTab = 1;">Gruplar</a>
+                    </li>
+                    <li ng-class="{active: selectedTab == 2}">
+                        <a href="#" ng-click="selectedTab = 2;">Ürünler</a>
+                    </li>
+                    <li ng-class="{active: selectedTab == 3}">
+                        <a href="#" ng-click="selectedTab = 3;">Özellikler</a>
+                    </li>
+                    <li ng-class="{active: selectedTab == 4}">
+                        <a href="#" ng-click="selectedTab = 4;">Ürün-Özellik</a>
+                    </li>
+                </ul>
+
+                <div class="tab-content" ng-show="selectedTab == 1">
+                    <table class="table table-bordered table-hover table-condensed">
+                        <tr style="font-weight: bold">
+                            <td style="width:100%">Grup Adı</td>
+                        </tr>
+                        <tr ng-repeat="group in groups">
+                            <td>
+                                <!-- editable group name -->
+                                <span editable-text="group.name" e-name="name" e-form="rowform" e-required>
+                                    {{ group.name || 'empty' }}
+                                </span>
+                            </td>
+                            <td style="white-space: nowrap">
+                                <!-- form -->
+                                <form editable-form name="rowform" onbeforesave="saveGroup($data, group.id)" ng-show="rowform.$visible" class="form-buttons form-inline" shown="inserted == group">
+                                    <button type="submit" ng-disabled="rowform.$waiting" class="btn btn-primary">
+                                        kaydet
+                                    </button>
+                                    <button type="button" ng-disabled="rowform.$waiting" ng-click="rowform.$cancel()" class="btn btn-default">
+                                        iptal
+                                    </button>
+                                </form>
+                                <div class="buttons" ng-show="!rowform.$visible">
+                                    <!--<button class="btn btn-primary" ng-click="rowform.$show()">edit</button>-->
+                                    <button class="btn btn-danger" ng-click="removeGroup($index)">sil</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <button class="btn btn-default" ng-click="addGroup()">Grup ekle</button>
+                </div>
+
+                <div class="tab-content" ng-show="selectedTab == 2">
+                    <table class="table table-bordered table-hover table-condensed">
+                        <tr style="font-weight: bold">
+                            <td style="width:20%">Marka</td>
+                            <td style="width:60%">Model</td>
+                            <td style="width:20%">Grup</td>
+                        </tr>
+
+                        <tr ng-repeat="product in products">
+                            <td>
+                                <span editable-text="product.brand" e-name="brand" e-form="rowform" e-required>
+                                    {{ product.brand || 'empty' }}
+                                </span>
+                            </td>
+                            <td>
+                                <span editable-text="product.model" e-name="model" e-form="rowform" e-required>
+                                    {{ product.model || 'empty' }}
+                                </span>
+                            </td>
+                            <td>
+                                <span editable-select="product.groupId" e-name="groupId" onshow="loadGroups()" e-form="rowform" e-ng-options="group.id as group.name for group in groups">
+                                    {{ showGroup(product) }}
+                                </span>
+                            </td>
+
+                            <td style="white-space: nowrap">
+                                    <!-- form -->
+                                <form editable-form name="rowform" onbeforesave="saveProduct($data, product.id)" ng-show="rowform.$visible" class="form-buttons form-inline" shown="inserted == product">
+                                    <button type="submit" ng-disabled="rowform.$waiting" class="btn btn-primary">
+                                        kaydet
+                                    </button>
+                                    <button type="button" ng-disabled="rowform.$waiting" ng-click="rowform.$cancel()" class="btn btn-default">
+                                        iptal
+                                    </button>
+                                </form>
+                                <div class="buttons" ng-show="!rowform.$visible">
+                                    <button class="btn btn-danger" ng-click="removeProduct($index)">sil</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <button class="btn btn-default" ng-click="addProduct()">Ürün ekle</button>
+                </div>
+
+                <div class="tab-content" ng-show="selectedTab == 3">
+                    <table class="table table-bordered table-hover table-condensed">
+                        <tr style="font-weight: bold">
+                            <td style="width:100%">Özellik</td>
+                        </tr>
+                        <tr ng-repeat="property in properties">
+                            <td>
+                                <span editable-text="property.name" e-name="name" e-form="rowform" e-required>
+                                    {{ property.name || 'empty' }}
+                                </span>
+                            </td>
+                            <td style="white-space: nowrap">
+                                    <!-- form -->
+                                <form editable-form name="rowform" onbeforesave="saveProperty($data, property.id)" ng-show="rowform.$visible" class="form-buttons form-inline" shown="inserted == property">
+                                    <button type="submit" ng-disabled="rowform.$waiting" class="btn btn-primary">
+                                        kaydet
+                                    </button>
+                                    <button type="button" ng-disabled="rowform.$waiting" ng-click="rowform.$cancel()" class="btn btn-default">
+                                        iptal
+                                    </button>
+                                </form>
+                                <div class="buttons" ng-show="!rowform.$visible">
+                                    <button class="btn btn-danger" ng-click="removeProperty($index)">sil</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <button class="btn btn-default" ng-click="addProperty()">Özellik ekle</button>
+                </div>
+
+                <div class="tab-content" ng-show="selectedTab == 4">
+                    <table class="table table-bordered table-hover table-condensed">
+                        <tr style="font-weight: bold">
+                            <td style="width:50%">Ürün</td>
+                            <td style="width:50%">Özellik</td>
+                        </tr>
+
+                        <tr ng-repeat="p in productProperties">
+                            <td>
+                                <span editable-select="p.productId" e-name="productId" onshow="loadProducts()" e-form="rowform" e-ng-options="product.id as product.model for product in products">
+                                    {{ showProduct(p) }}
+                                </span>
+                            </td>
+                            <td>
+                                <span editable-select="p.propertyId" e-name="propertyId" onshow="loadProperties()" e-form="rowform" e-ng-options="property.id as property.name for property in properties">
+                                    {{ showProperty(p) }}
+                                </span>
+                            </td>
+                            <td style="white-space: nowrap">
+                                    <!-- form -->
+                                <form editable-form name="rowform" onbeforesave="saveProductProperty($data)" ng-show="rowform.$visible" class="form-buttons form-inline" shown="inserted == p">
+                                    <button type="submit" ng-disabled="rowform.$waiting" class="btn btn-primary">
+                                        kaydet
+                                    </button>
+                                    <button type="button" ng-disabled="rowform.$waiting" ng-click="rowform.$cancel()" class="btn btn-default">
+                                        iptal
+                                    </button>
+                                </form>
+                                <div class="buttons" ng-show="!rowform.$visible">
+                                    <button class="btn btn-danger" ng-click="removeProductProperty($index)">sil</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <button class="btn btn-default" ng-click="addProductProperty()">Yeni eşleşme ekle</button>
+                </div>
+            </div>
+
+            <hr>
+
+            <div ng-controller="SearchCtrl" class="container" style="width: 600px">
+                <div class="row">
+                    <div class="input-group">
+                        <input type="text" ng-model="keywords" class="form-control"
+                            placeholder="Aramak istediğiniz ürün...">
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" type="submit" ng-click="search()">Ara</button>
+                        </span>
+                    </div>
+                </div>
+                <br>
+
+                <div ng-hide="isShowComments" ng-repeat="product in result">
+                    <div class="search-result-row" ng-click="getComments(product.id, product.brand, product.model)">
+                        <div class="search-result-header">
+                            <b>{{ product.brand }} {{ product.model }}</b>
+                        </div>
+                        <div class="search-result-details">
+                            <b>Grup:</b> {{ product.group }}<br>
+                            <b>Marka:</b> {{ product.brand }}<br>
+                            <b>Model:</b> {{ product.model }}<br>
+                        </div>
+                    </div>
+                </div>
+
+                <div ng-show="isShowComments">
+                    <div class="header">{{ productName }}</div>
+                    <br>
+                    <div ng-repeat="productComment in comments">
+                        <div>
+                            <div class="comment-header">{{ productComment.property }}</div>
+                            <div class="comment-row" ng-repeat="comment in productComment.comments">
+                                <div ng-show="calculateRating({{ comment.rating }})"></div>
+                                <div class="comment-title">{{ comment.title }}</div>
+                                <div class="comment-writer">{{ comment.writer }}</div>
+                                <div class="comment-rating">
+                                    <span style="display: block; width: 65px; height: 13px; background: url(@routes.Assets.at("star-rating-sprite.png")) 0 0;">
+                                        <span style="display: block; width: {{ rating }}; height: 13px; background: url(@routes.Assets.at("star-rating-sprite.png")) 0 -13px;"></span>
+                                    </span>
+                                </div>
+                                <div class="comment-content">{{ comment.content }}</div>
+                            </div>
+                            <br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
